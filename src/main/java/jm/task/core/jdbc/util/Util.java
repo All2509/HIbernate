@@ -1,10 +1,6 @@
 package jm.task.core.jdbc.util;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 import java.util.Properties;
 import jm.task.core.jdbc.model.User;
 import org.hibernate.HibernateException;
@@ -14,25 +10,6 @@ import org.hibernate.SessionFactory;
 
 
 public class Util {
-
-    private static final String url = "jdbc:mysql://127.0.0.1:3306/new_schema";
-    private static final String user = "jpauser";
-    private static final String password = "jpapwd";
-
-
-    public static Connection getConnection() {
-        Connection con = null;
-        try {
-            con = DriverManager.getConnection(url, user, password);
-            if (!con.isClosed()) {
-                System.out.println("Соединение с БД установлено");
-
-            }
-        } catch (SQLException s) {
-            System.err.println("Не удалось загрузить класс драйвера БД");
-        }
-        return con;
-    }
 
     private static SessionFactory sessionFactory = null;
     static  {
