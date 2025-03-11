@@ -1,42 +1,68 @@
 package jm.task.core.jdbc.util;
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import java.util.Properties;
+import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+
+
+
 public class Util {
-    // Параметры подключения
-    private static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver"; // Драйвер базы данных
-    private static final String URL = "jdbc:mysql://127.0.0.1:3306/new_schema"; // URL подключения
-    private static final String USER = "jpauser"; // Имя пользователя
-    private static final String PASSWORD = "jpapwd"; // Пароль
 
-    // Метод для получения соединения с базой данных
+    private static final String url = "jdbc:mysql://127.0.0.1:3306/new_schema";
+    private static final String user = "jpauser";
+    private static final String password = "jpapwd";
+
+
     public static Connection getConnection() {
-        Connection connection = null;
+        Connection con = null;
         try {
-            // Загружаем драйвер JDBC
-            Class.forName(DB_DRIVER);
-            // Устанавливаем соединение
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Соединение с базой данных успешно установлено.");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Драйвер не найден: " + e.getMessage());
-        } catch (SQLException e) {
-            System.err.println("Ошибка подключения: " + e.getMessage());
+            con = DriverManager.getConnection(url, user, password);
+            if (!con.isClosed()) {
+                System.out.println("Соединение с БД установлено");
+
+            }
+        } catch (SQLException s) {
+            System.err.println("Не удалось загрузить класс драйвера БД");
         }
-        return connection;
+        return con;
     }
 
-    // Метод для закрытия соединения
-    public static void closeConnection(Connection connection) {
-        if (connection != null) {
-            try {
-                connection.close();
-                System.out.println("Соединение с базой данных закрыто.");
-            } catch (SQLException e) {
-                System.err.println("Ошибка при закрытии соединения: " + e.getMessage());
-            }
+    private static SessionFactory sessionFactory = null;
+    static  {
+        try {
+            Properties settings = new Properties();
+            settings.setProperty("hibernate.connection.url","jdbc:mysql://127.0.0.1:3306/new_schema" );
+            settings.setProperty("hibernate.connection.username", "jpauser");
+            settings.setProperty("hibernate.connection.password","jpapwd" );
+            settings.setProperty("dialect", "org.hibernate.dialect.MySQLDialect");
+            settings.setProperty("hibernate.hbm2ddl.auto", "create");
+
+            sessionFactory = new org.hibernate.cfg.Configuration()
+                    .addProperties(settings)
+                    .addAnnotatedClass(User.class)
+                    .buildSessionFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
+    public static Session getSession() throws HibernateException{
+        return sessionFactory.openSession();
+    }
+
+    public static void close() throws HibernateException{
+        getSession().close();
+    }
+
 }
+
+
+
+
+

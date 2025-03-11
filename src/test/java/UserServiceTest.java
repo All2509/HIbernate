@@ -84,7 +84,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void cleanUsersTable() {
+     public void cleanUsersTable() {
         try {
             userService.dropUsersTable();
             userService.createUsersTable();
